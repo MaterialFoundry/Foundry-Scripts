@@ -93,6 +93,24 @@ EOF
 echo "-> Written to $autoStartFile"
 
 echo ""
+echo "---- Disabling Power Manager ----"
+uid=$(id -u "$username")
+
+systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+
+sudo -u "$username" \
+    env DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
+    xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/dpms-enabled -s false
+
+sudo -u "$username" \
+    env DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
+    xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/blank-on-ac -s 0
+
+sudo -u "$username" \
+    env DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
+    xfconf-query -c xfce4-power-manager -p /xfce4-power-manager/blank-on-battery -s 0
+
+echo ""
 echo "---- Optimizing Boot Time ----"
 #Disable unnecessary services
 systemctl disable bluetooth
